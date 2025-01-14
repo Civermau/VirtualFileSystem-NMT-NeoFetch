@@ -3,32 +3,33 @@
 #include <string>
 #include <vector>
 #include "File.h"
-#include <iostream>
 
-class Folder : public Node
+class Folder : public Node, public std::enable_shared_from_this<Folder>
 {
 public:
 	Folder(const std::string& folderName) {
 		this->folderName = folderName;
+		this->path = "~";
+	}
+	Folder(const std::string& folderName, std::shared_ptr<Folder> folder, std::string path) {
+		this->folderName = folderName;
+		this->parentFolder = folder;
+		this->path = path + "/" + folderName;
 	}
 	~Folder() = default;
 
-	NodeType Type() const;
+	NodeType GetType() const;
 	std::string GetName() const;
-	bool CreateFile(const std::string& fileName);
+	std::string GetPath();
+	std::shared_ptr<Folder> GetParent();
+	bool CreateContent(const std::string& fileName, NodeType type);
 	void ShowContents(void (*Display)(std::string folderName, std::vector<std::pair<std::string, NodeType>> data));
-
-private:
+	void ShowAll(void (*Display)(std::string name, NodeType nodeType, int level), int level);
+	std::weak_ptr<Folder> GetSubFolder(std::string folderName);
+public:
+	std::weak_ptr<Folder> parentFolder;
 	std::string folderName;
+	std::string path;
 	NodeType type = NodeType::NodeFolder;
-	std::vector<std::unique_ptr<Node>> contents;
+	std::vector<std::shared_ptr<Node>> contents;
 };
-
-namespace Display {
-	static void StandarDisplay(std::string folderName, std::vector<std::pair<std::string, NodeType>> data) {
-		std::cout << folderName << "/" << std::endl;
-		for (const std::pair<std::string, NodeType>& node : data) {
-			std::cout << "├──" << node.first << (node.second == NodeType::NodeFolder ? "/" : "") << std::endl;
-		}
-	}
-}

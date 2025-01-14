@@ -12,7 +12,7 @@ public:
 	}
 	~File() = default;
 	std::string GetName() const { return this->fileName; }
-	NodeType Type() const { return type; }
+	NodeType GetType() const { return type; }
 private:
 	NodeType type = NodeType::NodeFile;
 	std::string fileName;

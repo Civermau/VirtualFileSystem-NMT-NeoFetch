@@ -9,7 +9,7 @@ enum NodeType {
 
 class Node {
 public:
-	virtual NodeType Type() const = 0;
+	virtual NodeType GetType() const = 0;
 	virtual std::string GetName() const = 0;
 	virtual ~Node() = default;
 };
