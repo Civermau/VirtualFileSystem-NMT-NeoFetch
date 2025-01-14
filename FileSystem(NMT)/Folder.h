@@ -20,11 +20,11 @@ public:
 
 	NodeType GetType() const;
 	std::string GetName() const;
-	std::string GetPath();
+	std::string GetPath() const;
 	std::shared_ptr<Folder> GetParent();
 	bool CreateContent(const std::string& fileName, NodeType type);
-	void ShowContents(void (*Display)(std::string folderName, std::vector<std::pair<std::string, NodeType>> data));
-	void ShowAll(void (*Display)(std::string name, NodeType nodeType, int level), int level);
+	void ShowContents(void (*Display)(std::string name, NodeType nodeType, int level), int level = 0);
+	void ShowAll(void (*Display)(std::string name, NodeType nodeType, int level), int level = 0);
 	std::weak_ptr<Folder> GetSubFolder(std::string folderName);
 public:
 	std::weak_ptr<Folder> parentFolder;

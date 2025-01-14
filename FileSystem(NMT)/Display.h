@@ -5,35 +5,20 @@
 #include "handMade.h"
 
 namespace dsp {
-	static void StandarDisplay(std::string folderName, std::vector<std::pair<std::string, NodeType>> data) {
-		std::cout << folderName << "/" << std::endl;
-		for (const std::pair<std::string, NodeType>& node : data) {
-			std::cout << "├──" << node.first << (node.second == NodeType::NodeFolder ? "/" : "") << std::endl;
-		}
-	}
 	static void StandarDisplay(std::string content) {
 		std::cout << content;
 	}
 	static void StandarDisplay(std::string name, NodeType nodeType, int level) {
-		if (level == 0) {
-			std::cout << name << "/" << std::endl;
-			return;
+		for (int i = 0; i < level; i++) {
+			std::cout << "  ";
 		}
-		if (level == 1) {
-			std::cout << "├──" << name;
-			if (nodeType == NodeType::NodeFolder) {
-				std::cout << "/";
-			}
-			std::cout << std::endl;
-			return;
-		}
-		std::cout << "│  ";
-		for (int i = 2; i < level; i++) {
-			std::cout << "   ";
-		}
-		std::cout << "├──" << name;
+
+		std::cout << "\033[31m* \033[0m";
 		if (nodeType == NodeType::NodeFolder) {
-			std::cout << "/";
+			std::cout << "\033[38;2;255;187;171m" << name << "/\033[0m";
+		}
+		if (nodeType == NodeType::NodeFile) {
+			std::cout << "\033[38;2;255;255;255m" << name << "\033[0m";
 		}
 		std::cout << std::endl;
 	}

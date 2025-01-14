@@ -34,29 +34,30 @@ std::shared_ptr<Folder> Folder::GetParent() {
 	return parentFolder.lock();
 }
 
-std::string Folder::GetPath() {
+std::string Folder::GetPath() const {
 	return path;
 }
 
-void Folder::ShowContents(void (*Display)(std::string folderName, std::vector<std::pair<std::string, NodeType>> data)) {
-	std::vector<std::pair<std::string, NodeType>> data;
-
-	for (const std::shared_ptr<Node>& content : contents) {
-		data.emplace_back(std::make_pair(content->GetName(), content->GetType()));
-	}
-	Display(this->folderName, data);
-
-}
-
-void Folder::ShowAll(void (*Display)(std::string name, NodeType nodeType, int level ), int level) {
+void Folder::ShowContents(void (*Display)(std::string name, NodeType nodeType, int level), int level) {
 	Display(folderName, this->type, level);
 	for (const std::shared_ptr<Node>& content : contents) {
-		if (content->GetType() == NodeType::NodeFile) {
-			Display(content->GetName(), NodeType::NodeFile, level + 1);
+		if (content == contents.back()) {
+			Display(content->GetName(), content->GetType(), (level + 1) * -1);
 			continue;
 		}
-		if (content->GetType() == NodeType::NodeFolder) {
-			dynamic_cast<Folder*>(content.get())->ShowAll(Display, level + 1);
+		Display(content->GetName(), content->GetType(), level + 1);
+	}
+}
+
+void Folder::ShowAll(void (*Display)(std::string name, NodeType nodeType, int level), int level) {
+	Display(folderName, this->type, level);
+	for (const std::shared_ptr<Node> content : contents) {
+		int currentLevel = level + 1;
+		if (content->GetType() == NodeType::NodeFile) {
+			Display(content->GetName(), NodeType::NodeFile, currentLevel);
+		}
+		else if (content->GetType() == NodeType::NodeFolder) {
+			dynamic_cast<Folder*>(content.get())->ShowAll(Display, currentLevel);
 		}
 	}
 }
