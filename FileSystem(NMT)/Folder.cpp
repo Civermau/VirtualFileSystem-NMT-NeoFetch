@@ -10,7 +10,7 @@ NodeType Folder::GetType() const { return type; };
 
 bool Folder::CreateContent(const std::string& name, NodeType type) {
 	std::vector<std::shared_ptr<Node>>::iterator it = std::find_if(contents.begin(), contents.end(),
-		[name](std::shared_ptr<Node>& file) -> bool {return (file->GetName() == name); });
+		[&name](std::shared_ptr<Node>& file) -> bool {return (file->GetName() == name); });
 	if (it != contents.end()) {
 		return false;
 	}
@@ -41,10 +41,6 @@ std::string Folder::GetPath() const {
 void Folder::ShowContents(void (*Display)(std::string name, NodeType nodeType, int level), int level) {
 	Display(folderName, this->type, level);
 	for (const std::shared_ptr<Node>& content : contents) {
-		if (content == contents.back()) {
-			Display(content->GetName(), content->GetType(), (level + 1) * -1);
-			continue;
-		}
 		Display(content->GetName(), content->GetType(), level + 1);
 	}
 }
@@ -57,17 +53,32 @@ void Folder::ShowAll(void (*Display)(std::string name, NodeType nodeType, int le
 			Display(content->GetName(), NodeType::NodeFile, currentLevel);
 		}
 		else if (content->GetType() == NodeType::NodeFolder) {
-			dynamic_cast<Folder*>(content.get())->ShowAll(Display, currentLevel);
+			if (auto folder = std::dynamic_pointer_cast<Folder>(content)) {
+				folder->ShowAll(Display, currentLevel);
+			}
 		}
 	}
 }
 
 std::weak_ptr<Folder> Folder::GetSubFolder(std::string folderName) {
+	//auto type instead
 	std::vector<std::shared_ptr<Node>>::iterator it = std::find_if(contents.begin(), contents.end(),
-		[folderName](std::shared_ptr<Node>& file) -> bool {return (file->GetName() == folderName && file->GetType() == NodeType::NodeFolder); });
+		[&folderName](std::shared_ptr<Node>& file) -> bool {return (file->GetName() == folderName && file->GetType() == NodeType::NodeFolder); });
 	if (it != contents.end()) {
 		return std::static_pointer_cast<Folder>(*it);
 	}
 	return std::weak_ptr<Folder>();
 	
+}
+
+bool Folder::DeleteContent(std::string name) {
+	//auto type instead
+	std::vector<std::shared_ptr<Node>>::iterator it = std::find_if(contents.begin(), contents.end(),
+		[&name](std::shared_ptr<Node>& file) -> bool {return (file->GetName() == name); });
+	if (it == contents.end()) {
+		return false;
+	}
+	contents.erase(it);
+	return true;
+
 }

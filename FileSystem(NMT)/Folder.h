@@ -26,7 +26,8 @@ public:
 	void ShowContents(void (*Display)(std::string name, NodeType nodeType, int level), int level = 0);
 	void ShowAll(void (*Display)(std::string name, NodeType nodeType, int level), int level = 0);
 	std::weak_ptr<Folder> GetSubFolder(std::string folderName);
-public:
+	bool DeleteContent(std::string folderName);
+private:
 	std::weak_ptr<Folder> parentFolder;
 	std::string folderName;
 	std::string path;

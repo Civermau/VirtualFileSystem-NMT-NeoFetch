@@ -1,25 +1,19 @@
 #include <iostream>
 #include "Folder.h"
 #include "Display.h"
-
 int main() {
 	std::shared_ptr<Folder> root = std::make_shared<Folder>("~");
 	std::shared_ptr<Folder> ALIVE = root;
-	root->CreateContent("testFile.txt", NodeType::NodeFile);
-	root->CreateContent("nyasu.rar", NodeType::NodeFile);
-	root->CreateContent("nuevvo.txt", NodeType::NodeFile);
-	root->CreateContent("folder", NodeType::NodeFolder);
 	while (true) {
 		dsp::StandarDisplay(root->GetPath() + "$ ");
-		//root->ShowAll(dsp::StandarDisplay, 0);
 		std::string command = dsp::GetInput();
 		std::string preCmd = dsp::GetCMD(command);
-
+		
 		if (preCmd == "clear") {
 			dsp::ClearConsole();
 			continue;
 		}
-
+		
 		if (preCmd == "ls") {
 			root->ShowContents(dsp::StandarDisplay);
 		}
@@ -28,34 +22,48 @@ int main() {
 			root->ShowAll(dsp::StandarDisplay, 0);
 		}
 
+		if (preCmd == "close") {
+			break;
+		}
+
 		if (command == "\0") {
 			continue;
 		}
 
+		if (preCmd == "rm") {
+			if (!root->DeleteContent(command)) {
+				dsp::StandarDisplay("bash: rm: " + command + ": Doesn't exists\n");
+			}
+		}
+		
+
 		if (preCmd == "cd") {
 			if (command == "..") {
-				root = root->parentFolder.lock();
+				root = root->GetParent();
+				continue;
 			}
-			if (!root->GetSubFolder(command).expired()) {
-				root = root->GetSubFolder(command).lock();
+			if (command == "~") {
+				root = ALIVE;
+				continue;
 			}
+			if (root->GetSubFolder(command).expired()) {
+				dsp::StandarDisplay("bash: cd:  " + command + ": No such file or directory\n");
+				continue;
+			}
+			root = root->GetSubFolder(command).lock();
 			continue;
 		}
 		if (preCmd == "mkdir") {
-			root->CreateContent(command, NodeType::NodeFolder);
+			if (!root->CreateContent(command, NodeType::NodeFolder)) {
+				dsp::StandarDisplay("bash: mkdir:  " + command + ": Directory already exists\n");
+			}
 			continue;
 		}
 		if (preCmd == "touch") {
-			root->CreateContent(command, NodeType::NodeFile);
+			if (!root->CreateContent(command, NodeType::NodeFile)) {
+				dsp::StandarDisplay("bash: touch:  " + command + ": File already exists\n");
+			}
 			continue;
 		}
-		
-		//if (dsp::GetCMD(preCmd) == "cddd") {
-		//	root = root->parentFolder.lock();
-		//	ALIVE->ShowAll(dsp::StandarDisplay, 0);
-		//	continue;
-		//}
 	}
-	root->ShowAll(dsp::StandarDisplay, 0);
-
 }
