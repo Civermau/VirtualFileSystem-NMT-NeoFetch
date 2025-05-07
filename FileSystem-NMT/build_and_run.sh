@@ -6,7 +6,7 @@
 # -g                        : Include debug information in the executable
 # main.cpp & Folder.cpp     : Source files to compile
 # -o VirtualFileSystem     : Name of the output executable
-g++ -fdiagnostics-color=always -g main.cpp Folder.cpp -o VirtualFileSystem
+g++ -fdiagnostics-color=always -g main.cpp Folder.cpp CommandHandler.cpp -o VirtualFileSystem
 
 # Check if compilation was successful
 if [ $? -eq 0 ]; then
